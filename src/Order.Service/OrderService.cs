@@ -2,29 +2,29 @@
 using Order.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Order.Service
 {
-    public class OrderService : IOrderService
+    public class OrderService(IOrderRepository orderRepository) : IOrderService
     {
-        private readonly IOrderRepository _orderRepository;
+        public async Task<IEnumerable<OrderSummary>> GetOrdersAsync() =>
+            await orderRepository.GetOrdersAsync();
 
-        public OrderService(IOrderRepository orderRepository)
-        {
-            _orderRepository = orderRepository;
-        }
+        public async Task<IEnumerable<OrderSummary>> GetOrdersByStatusAsync(string orderStatus) => 
+            await orderRepository.GetOrdersByStatusAsync(orderStatus);
 
-        public async Task<IEnumerable<OrderSummary>> GetOrdersAsync()
-        {
-            var orders = await _orderRepository.GetOrdersAsync();
-            return orders;
-        }
+        public async Task<OrderDetail> GetOrderByIdAsync(Guid orderId) =>
+            await orderRepository.GetOrderByIdAsync(orderId);
 
-        public async Task<OrderDetail> GetOrderByIdAsync(Guid orderId)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            return order;
-        }
+        public async Task<OrderDetail> UpdateOrderStatusAsync(Guid orderId, string orderStatus) =>
+            await orderRepository.UpdateOrderStatusAsync(orderId, orderStatus);
+
+        public async Task<Guid?> CreateOrderAsync(CreateOrder order) =>
+            await orderRepository.CreateOrderAsync(order);
+
+        public async Task<IEnumerable<MonthProfit>> GetProfitByMonthAsync() =>
+            await orderRepository.GetProfitByMonthAsync();
     }
 }
